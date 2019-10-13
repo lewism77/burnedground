@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"image/color"
 	"log"
 
 	"github.com/hajimehoshi/ebiten"
@@ -18,8 +19,14 @@ const (
 )
 
 var (
-	tank1 tank.Tank
+	tank1      tank.Tank
+	brushImage *ebiten.Image
 )
+
+func init() {
+	brushImage, _ = ebiten.NewImage(4, 4, ebiten.FilterDefault)
+	brushImage.Fill(color.White)
+}
 
 func update(screen *ebiten.Image) error {
 	if ebiten.IsKeyPressed(ebiten.KeyKP4) {
@@ -47,6 +54,8 @@ func update(screen *ebiten.Image) error {
 		tank1.Angle++
 	}
 
+	paint(screen, tank1.LocX, tank1.LocY)
+
 	if ebiten.IsDrawingSkipped() {
 		return nil
 	}
@@ -58,6 +67,12 @@ func update(screen *ebiten.Image) error {
 	ebitenutil.DebugPrintAt(screen, powerText, tank1.LocX, tank1.LocY+10)
 
 	return nil
+}
+
+func paint(screen *ebiten.Image, x, y int) {
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(float64(x), float64(y))
+	screen.DrawImage(brushImage, op)
 }
 
 func main() {
