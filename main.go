@@ -8,11 +8,10 @@ import (
 
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
-	"github.com/hajimehoshi/ebiten/inpututil"
 
+	"burnedground/keymap"
 	"burnedground/projectile"
 	"burnedground/tank"
-	"burnedground/vector"
 )
 
 const (
@@ -53,65 +52,8 @@ func init() {
 	currentTankIndex = 0
 }
 
-func repeatingKeyPressed(key ebiten.Key) bool {
-	const (
-		delay    = 30
-		interval = 3
-	)
-	d := inpututil.KeyPressDuration(key)
-	if d == 1 {
-		return true
-	}
-	if d >= delay && (d-delay)%interval == 0 {
-		return true
-	}
-	return false
-}
-
 func update(screen *ebiten.Image) error {
-	if ebiten.IsKeyPressed(ebiten.KeyKP4) {
-		currentTank.LocX--
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyKP6) {
-		currentTank.LocX++
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyKP8) {
-		currentTank.LocY--
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyKP2) {
-		currentTank.LocY++
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		currentTank.Power++
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		currentTank.Power--
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		currentTank.Angle--
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		currentTank.Angle++
-	}
-	if repeatingKeyPressed(ebiten.KeyT) {
-		if currentTankIndex+1 >= len(tanks) {
-			currentTankIndex = 0
-		} else {
-			currentTankIndex++
-		}
-
-		currentTank = tanks[currentTankIndex]
-	}
-	if repeatingKeyPressed(ebiten.KeySpace) {
-		newProjectile := projectile.New(currentTank.Power, currentTank.Angle)
-
-		newProjectile.Owner = currentTank.Player
-		newProjectile.Position = vector.Vector{
-			X: float64(currentTank.LocX),
-			Y: float64(currentTank.LocY),
-		}
-		projectiles = append(projectiles, &newProjectile)
-	}
+	keymap.Logic(&currentTank, &currentTankIndex, &tanks, &projectiles)
 
 	for ix := range projectiles {
 		draw(screen, int(projectiles[ix].Position.X), int(projectiles[ix].Position.Y))
