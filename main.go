@@ -23,15 +23,34 @@ const (
 )
 
 var (
-	tank1       tank.Tank
-	brushImage  *ebiten.Image
-	projectiles []*projectile.Projectile
+	currentTank      *tank.Tank
+	brushImage       *ebiten.Image
+	tanks            []*tank.Tank
+	projectiles      []*projectile.Projectile
+	currentTankIndex int
 )
 
 func init() {
 	brushImage, _ = ebiten.NewImage(4, 4, ebiten.FilterDefault)
 	brushImage.Fill(color.White)
 	projectiles = make([]*projectile.Projectile, 0)
+	tanks = make([]*tank.Tank, 0)
+
+	tank1 := tank.Tank{
+		LocX: 10,
+		LocY: 10,
+	}
+
+	tank2 := tank.Tank{
+		LocX: 400,
+		LocY: 100,
+	}
+
+	tanks = append(tanks, &tank1)
+	tanks = append(tanks, &tank2)
+
+	currentTank = &tank1
+	currentTankIndex = 0
 }
 
 func repeatingKeyPressed(key ebiten.Key) bool {
@@ -51,36 +70,45 @@ func repeatingKeyPressed(key ebiten.Key) bool {
 
 func update(screen *ebiten.Image) error {
 	if ebiten.IsKeyPressed(ebiten.KeyKP4) {
-		tank1.LocX--
+		currentTank.LocX--
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyKP6) {
-		tank1.LocX++
+		currentTank.LocX++
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyKP8) {
-		tank1.LocY--
+		currentTank.LocY--
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyKP2) {
-		tank1.LocY++
+		currentTank.LocY++
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		tank1.Power++
+		currentTank.Power++
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		tank1.Power--
+		currentTank.Power--
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		tank1.Angle--
+		currentTank.Angle--
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		tank1.Angle++
+		currentTank.Angle++
+	}
+	if repeatingKeyPressed(ebiten.KeyT) {
+		if currentTankIndex+1 >= len(tanks) {
+			currentTankIndex = 0
+		} else {
+			currentTankIndex++
+		}
+
+		currentTank = tanks[currentTankIndex]
 	}
 	if repeatingKeyPressed(ebiten.KeySpace) {
-		newProjectile := projectile.New(tank1.Power, tank1.Angle)
+		newProjectile := projectile.New(currentTank.Power, currentTank.Angle)
 
-		newProjectile.Owner = tank1.Player
+		newProjectile.Owner = currentTank.Player
 		newProjectile.Position = vector.Vector{
-			X: float64(tank1.LocX),
-			Y: float64(tank1.LocY),
+			X: float64(currentTank.LocX),
+			Y: float64(currentTank.LocY),
 		}
 		projectiles = append(projectiles, &newProjectile)
 	}
@@ -111,19 +139,21 @@ func update(screen *ebiten.Image) error {
 	}
 	projectiles = projectiles[:ix]
 
-	draw(screen, tank1.LocX, tank1.LocY)
+	for _, tank := range tanks {
+		draw(screen, tank.LocX, tank.LocY)
+
+		angleText := "Angle: " + fmt.Sprintf("%.2f", tank.Angle)
+		powerText := "Power: " + fmt.Sprintf("%.2f", tank.Power)
+
+		ebitenutil.DebugPrintAt(screen, angleText, tank.LocX, tank.LocY)
+		ebitenutil.DebugPrintAt(screen, powerText, tank.LocX, tank.LocY+10)
+
+		ebitenutil.DebugPrintAt(screen, "Projectile Count: "+strconv.Itoa(len(projectiles)), tank.LocX, tank.LocY+20)
+	}
 
 	if ebiten.IsDrawingSkipped() {
 		return nil
 	}
-
-	angleText := "Angle: " + fmt.Sprintf("%.2f", tank1.Angle)
-	powerText := "Power: " + fmt.Sprintf("%.2f", tank1.Power)
-
-	ebitenutil.DebugPrintAt(screen, angleText, tank1.LocX, tank1.LocY)
-	ebitenutil.DebugPrintAt(screen, powerText, tank1.LocX, tank1.LocY+10)
-
-	ebitenutil.DebugPrintAt(screen, "Projectile Count: "+strconv.Itoa(len(projectiles)), tank1.LocX, tank1.LocY+20)
 
 	return nil
 }
