@@ -27,29 +27,33 @@ func repeatingKeyPressed(key ebiten.Key) bool {
 
 // Logic executes any actions based on pressed keys this cycle
 func Logic(currentTank **tank.Tank, currentTankIndex *int, tanks *[]*tank.Tank, projectiles *[]*projectile.Projectile) {
-	if ebiten.IsKeyPressed(ebiten.KeyKP4) {
-		(*currentTank).LocX--
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyKP6) {
-		(*currentTank).LocX++
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyKP8) {
-		(*currentTank).LocY--
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyKP2) {
-		(*currentTank).LocY++
-	}
 	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		(*currentTank).Power++
+		if ebiten.IsKeyPressed(ebiten.KeyShift) {
+			(*currentTank).LocY--
+		} else {
+			(*currentTank).Power++
+		}
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		(*currentTank).Power--
+		if ebiten.IsKeyPressed(ebiten.KeyShift) {
+			(*currentTank).LocY++
+		} else {
+			(*currentTank).Power--
+		}
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		(*currentTank).Angle--
+		if ebiten.IsKeyPressed(ebiten.KeyShift) {
+			(*currentTank).LocX--
+		} else {
+			(*currentTank).Angle--
+		}
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		(*currentTank).Angle++
+		if ebiten.IsKeyPressed(ebiten.KeyShift) {
+			(*currentTank).LocX++
+		} else {
+			(*currentTank).Angle++
+		}
 	}
 	if repeatingKeyPressed(ebiten.KeyT) {
 		if *currentTankIndex+1 >= len(*tanks) {
