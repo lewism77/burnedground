@@ -9,9 +9,9 @@ import (
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
 
+	"github.com/lewism77/burnedground/keymap"
 	"github.com/lewism77/burnedground/projectile"
 	"github.com/lewism77/burnedground/tank"
-	"github.com/lewism77/burnedground/vector"
 )
 
 const (

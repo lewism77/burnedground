@@ -1,9 +1,9 @@
 package keymap
 
 import (
-	"burnedground/projectile"
-	"burnedground/tank"
-	"burnedground/vector"
+	"github.com/lewism77/burnedground/projectile"
+	"github.com/lewism77/burnedground/tank"
+	"github.com/lewism77/burnedground/vector"
 
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/inpututil"
