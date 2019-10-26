@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	screenWidth  = 600
+	screenWidth  = 800
 	screenHeight = 600
 	screenScale  = 1
 	windowTitle  = "Burned Ground"
