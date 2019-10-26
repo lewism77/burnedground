@@ -1,8 +1,9 @@
 package projectile
 
 import (
-	"burnedground/vector"
 	"math"
+
+	"github.com/lewism77/burnedground/vector"
 )
 
 // Projectile stores info on a projectile
