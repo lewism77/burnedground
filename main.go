@@ -9,9 +9,9 @@ import (
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
 
-	"burnedground/keymap"
-	"burnedground/projectile"
-	"burnedground/tank"
+	"github.com/lewism77/burnedground/projectile"
+	"github.com/lewism77/burnedground/tank"
+	"github.com/lewism77/burnedground/vector"
 )
 
 const (
@@ -70,11 +70,8 @@ func update(screen *ebiten.Image) error {
 
 	ix := 0
 	for _, proj := range projectiles {
-		if proj.Position.X < -10 ||
-			proj.Position.X > screenWidth+10 ||
-			proj.Position.Y < -10 ||
-			proj.Position.Y > screenHeight+10 {
-		} else {
+		if -10 <= proj.Position.X && proj.Position.X <= screenWidth+10 &&
+			-10 <= proj.Position.Y && proj.Position.Y <= screenHeight+10 {
 			projectiles[ix] = proj
 			ix++
 		}

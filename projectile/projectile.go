@@ -1,8 +1,9 @@
 package projectile
 
 import (
-	"burnedground/vector"
 	"math"
+
+	"github.com/lewism77/burnedground/vector"
 )
 
 // Projectile stores info on a projectile
@@ -20,7 +21,7 @@ func resolution(power float64, directionInRad float64) vector.Vector {
 	}
 }
 
-func degreesToRadians(deg float64) float64 { return 3.14159274 / 180 * deg }
+func degreesToRadians(deg float64) float64 { return math.Pi / 180 * deg }
 
 // New intialises a new projectiles values
 func New(power float64, directionInDegrees float64) Projectile {
