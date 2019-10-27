@@ -12,6 +12,7 @@ import (
 	"github.com/lewism77/burnedground/keymap"
 	"github.com/lewism77/burnedground/projectile"
 	"github.com/lewism77/burnedground/tank"
+	"github.com/lewism77/burnedground/terrain"
 )
 
 const (
@@ -50,6 +51,9 @@ func init() {
 
 	currentTank = &tank1
 	currentTankIndex = 0
+
+	terrain.Init(screenWidth, screenHeight)
+	terrain.Generate()
 }
 
 func update(screen *ebiten.Image) error {
@@ -88,6 +92,13 @@ func update(screen *ebiten.Image) error {
 		ebitenutil.DebugPrintAt(screen, powerText, tank.LocX, tank.LocY+10)
 
 		ebitenutil.DebugPrintAt(screen, "Projectile Count: "+strconv.Itoa(len(projectiles)), tank.LocX, tank.LocY+20)
+	}
+
+	//for pixX, pixCol := range *terrain.Grid {
+	for pixX, pixCol := range terrain.Grid {
+		for _, pixY := range pixCol {
+			draw(screen, pixX, pixY)
+		}
 	}
 
 	if ebiten.IsDrawingSkipped() {
