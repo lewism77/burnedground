@@ -28,6 +28,7 @@ var (
 	tanks            []*tank.Tank
 	projectiles      []*projectile.Projectile
 	currentTankIndex int
+	terrainColumns   []*ebiten.Image
 )
 
 func init() {
@@ -54,13 +55,32 @@ func init() {
 
 	terrain.Init(screenWidth, screenHeight)
 	terrain.Generate()
+
+	var groundHeight int
+	var groundColumn *ebiten.Image
+	for _, pixCol := range terrain.Grid {
+		for _, onoff := range pixCol {
+			if onoff == 0 {
+				continue
+			}
+			groundHeight++
+		}
+		groundColumn, _ = ebiten.NewImage(1, groundHeight, ebiten.FilterDefault)
+		groundColumn.Fill(color.White)
+		terrainColumns = append(terrainColumns, groundColumn)
+		groundHeight = 0
+	}
 }
 
 func update(screen *ebiten.Image) error {
+	debugFps := fmt.Sprintf(`TPS: %0.2f
+	FPS: %0.2f`, ebiten.CurrentTPS(), ebiten.CurrentFPS())
+	ebitenutil.DebugPrint(screen, debugFps)
+
 	keymap.Logic(&currentTank, &currentTankIndex, &tanks, &projectiles)
 
 	for ix := range projectiles {
-		draw(screen, int(projectiles[ix].Position.X), int(projectiles[ix].Position.Y))
+		draw(screen, brushImage, int(projectiles[ix].Position.X), int(projectiles[ix].Position.Y))
 		projectiles[ix].Logic()
 
 		velText := "Acc X: " + fmt.Sprintf("%.2f", projectiles[ix].Acceleration.X) + ", Acc Y: " + fmt.Sprintf("%.2f", projectiles[ix].Acceleration.Y)
@@ -83,7 +103,7 @@ func update(screen *ebiten.Image) error {
 	projectiles = projectiles[:ix]
 
 	for _, tank := range tanks {
-		draw(screen, tank.LocX, tank.LocY)
+		draw(screen, brushImage, tank.LocX, tank.LocY)
 
 		angleText := "Angle: " + fmt.Sprintf("%.2f", tank.Angle)
 		powerText := "Power: " + fmt.Sprintf("%.2f", tank.Power)
@@ -94,11 +114,9 @@ func update(screen *ebiten.Image) error {
 		ebitenutil.DebugPrintAt(screen, "Projectile Count: "+strconv.Itoa(len(projectiles)), tank.LocX, tank.LocY+20)
 	}
 
-	//for pixX, pixCol := range *terrain.Grid {
-	for pixX, pixCol := range terrain.Grid {
-		for _, pixY := range pixCol {
-			draw(screen, pixX, pixY)
-		}
+	for pixX, groundColumn := range terrainColumns {
+		_, pixY := groundColumn.Size()
+		draw(screen, groundColumn, pixX, screenHeight-pixY)
 	}
 
 	if ebiten.IsDrawingSkipped() {
@@ -108,10 +126,10 @@ func update(screen *ebiten.Image) error {
 	return nil
 }
 
-func draw(screen *ebiten.Image, x, y int) {
+func draw(screen, image *ebiten.Image, x, y int) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(x), float64(y))
-	screen.DrawImage(brushImage, op)
+	screen.DrawImage(image, op)
 }
 
 func main() {
