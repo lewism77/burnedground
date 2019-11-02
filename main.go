@@ -23,15 +23,20 @@ const (
 
 var (
 	currentTank      *tank.Tank
-	brushImage       *ebiten.Image
+	projectileImage  *ebiten.Image
+	tankImage        *ebiten.Image
 	tanks            []*tank.Tank
 	projectiles      []*projectile.Projectile
 	currentTankIndex int
 )
 
 func init() {
-	brushImage, _ = ebiten.NewImage(4, 4, ebiten.FilterDefault)
-	brushImage.Fill(color.White)
+	projectileImage, _ = ebiten.NewImage(4, 4, ebiten.FilterDefault)
+	projectileImage.Fill(color.White)
+
+	tankImage, _ = ebiten.NewImage(15, 15, ebiten.FilterLinear)
+	tankImage.Fill(color.White)
+
 	projectiles = make([]*projectile.Projectile, 0)
 	tanks = make([]*tank.Tank, 0)
 
@@ -55,8 +60,12 @@ func init() {
 func update(screen *ebiten.Image) error {
 	keymap.Logic(&currentTank, &currentTankIndex, &tanks, &projectiles)
 
+	if ebiten.IsDrawingSkipped() {
+		return nil
+	}
+
 	for ix := range projectiles {
-		draw(screen, int(projectiles[ix].Position.X), int(projectiles[ix].Position.Y))
+		draw(screen, projectileImage, int(projectiles[ix].Position.X), int(projectiles[ix].Position.Y))
 		projectiles[ix].Logic()
 
 		velText := "Acc X: " + fmt.Sprintf("%.2f", projectiles[ix].Acceleration.X) + ", Acc Y: " + fmt.Sprintf("%.2f", projectiles[ix].Acceleration.Y)
@@ -79,7 +88,7 @@ func update(screen *ebiten.Image) error {
 	projectiles = projectiles[:ix]
 
 	for _, tank := range tanks {
-		draw(screen, tank.LocX, tank.LocY)
+		draw(screen, tankImage, tank.LocX, tank.LocY)
 
 		angleText := "Angle: " + fmt.Sprintf("%.2f", tank.Angle)
 		powerText := "Power: " + fmt.Sprintf("%.2f", tank.Power)
@@ -90,14 +99,10 @@ func update(screen *ebiten.Image) error {
 		ebitenutil.DebugPrintAt(screen, "Projectile Count: "+strconv.Itoa(len(projectiles)), tank.LocX, tank.LocY+20)
 	}
 
-	if ebiten.IsDrawingSkipped() {
-		return nil
-	}
-
 	return nil
 }
 
-func draw(screen *ebiten.Image, x, y int) {
+func draw(screen, brushImage *ebiten.Image, x, y int) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(x), float64(y))
 	screen.DrawImage(brushImage, op)

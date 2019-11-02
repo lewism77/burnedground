@@ -6,6 +6,8 @@ import (
 	"github.com/lewism77/burnedground/vector"
 )
 
+const powerRatio = 0.1
+
 // Projectile stores info on a projectile
 type Projectile struct {
 	Owner        int
@@ -27,7 +29,7 @@ func degreesToRadians(deg float64) float64 { return math.Pi / 180 * deg }
 func New(power float64, directionInDegrees float64) Projectile {
 	gravityPower := 0.2 // in pixels
 	p := Projectile{
-		Velocity:     resolution(power, degreesToRadians(directionInDegrees)),
+		Velocity:     resolution((power * powerRatio), degreesToRadians(directionInDegrees)),
 		Acceleration: resolution(gravityPower, degreesToRadians(90.0)), // 270 gravity down
 	}
 	return p

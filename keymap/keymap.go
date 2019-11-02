@@ -31,28 +31,40 @@ func Logic(currentTank **tank.Tank, currentTankIndex *int, tanks *[]*tank.Tank, 
 		if ebiten.IsKeyPressed(ebiten.KeyShift) {
 			(*currentTank).LocY--
 		} else {
-			(*currentTank).Power++
+			if (*currentTank).Power < 100 {
+				(*currentTank).Power++
+			}
 		}
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyDown) {
 		if ebiten.IsKeyPressed(ebiten.KeyShift) {
 			(*currentTank).LocY++
 		} else {
-			(*currentTank).Power--
+			if ((*currentTank).Power) > 0 {
+				(*currentTank).Power--
+			}
 		}
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
 		if ebiten.IsKeyPressed(ebiten.KeyShift) {
 			(*currentTank).LocX--
 		} else {
-			(*currentTank).Angle--
+			if ((*currentTank).Angle) > 0 {
+				(*currentTank).Angle--
+			} else {
+				(*currentTank).Angle = 359
+			}
 		}
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyRight) {
 		if ebiten.IsKeyPressed(ebiten.KeyShift) {
 			(*currentTank).LocX++
 		} else {
-			(*currentTank).Angle++
+			if ((*currentTank).Angle) < 360 {
+				(*currentTank).Angle++
+			} else {
+				(*currentTank).Angle = 0
+			}
 		}
 	}
 	if repeatingKeyPressed(ebiten.KeyT) {
