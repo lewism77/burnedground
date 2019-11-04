@@ -16,14 +16,16 @@ import (
 )
 
 const (
-	screenWidth  = 800
-	screenHeight = 600
-	screenScale  = 1
-	windowTitle  = "Burned Ground"
-	tankWidth    = 30
-	tankHeight   = 10
-	turretWidth  = 4
-	turretHeight = 20
+	screenWidth      = 800
+	screenHeight     = 600
+	screenScale      = 1
+	windowTitle      = "Burned Ground"
+	tankWidth        = 30
+	tankHeight       = 10
+	turretWidth      = 4
+	turretHeight     = 20
+	projectileWidth  = 4
+	projectileHeight = 4
 )
 
 var (
@@ -37,7 +39,7 @@ var (
 )
 
 func init() {
-	projectileImage, _ = ebiten.NewImage(4, 4, ebiten.FilterDefault)
+	projectileImage, _ = ebiten.NewImage(projectileWidth, projectileHeight, ebiten.FilterDefault)
 	projectileImage.Fill(color.White)
 
 	tankImage, _ = ebiten.NewImage(tankWidth, tankHeight, ebiten.FilterDefault)
@@ -78,8 +80,15 @@ func update(screen *ebiten.Image) error {
 	}
 
 	for ix := range projectiles {
-		draw(screen, projectileImage, int(projectiles[ix].Position.X), int(projectiles[ix].Position.Y))
+		draw(screen, projectileImage, int(projectiles[ix].Position.X), int(projectiles[ix].Position.Y), projectileWidth, projectileHeight)
 		projectiles[ix].Logic()
+		if -10 <= projectiles[ix].Position.X && projectiles[ix].Position.X <= screenWidth+10 &&
+			-10 <= projectiles[ix].Position.Y && projectiles[ix].Position.Y <= screenHeight+10 &&
+			!checkCollisions(projectiles[ix], tanks) {
+			projectiles[ix].Remove = false
+		} else {
+			projectiles[ix].Remove = true
+		}
 
 		velText := "Acc X: " + fmt.Sprintf("%.2f", projectiles[ix].Acceleration.X) + ", Acc Y: " + fmt.Sprintf("%.2f", projectiles[ix].Acceleration.Y)
 		accText := "Vel X: " + fmt.Sprintf("%.2f", projectiles[ix].Velocity.X) + ", Vel Y: " + fmt.Sprintf("%.2f", projectiles[ix].Velocity.Y)
@@ -92,8 +101,7 @@ func update(screen *ebiten.Image) error {
 
 	ix := 0
 	for _, proj := range projectiles {
-		if -10 <= proj.Position.X && proj.Position.X <= screenWidth+10 &&
-			-10 <= proj.Position.Y && proj.Position.Y <= screenHeight+10 {
+		if !proj.Remove {
 			projectiles[ix] = proj
 			ix++
 		}
@@ -101,7 +109,7 @@ func update(screen *ebiten.Image) error {
 	projectiles = projectiles[:ix]
 
 	for _, tank := range tanks {
-		draw(screen, tankImage, tank.LocX, tank.LocY)
+		draw(screen, tankImage, tank.LocX, tank.LocY, tankWidth, tankHeight)
 		drawTurret(screen, turretImage, tank.LocX, tank.LocY, tank.Angle)
 
 		angleText := "Angle: " + fmt.Sprintf("%.2f", tank.Angle)
@@ -116,17 +124,30 @@ func update(screen *ebiten.Image) error {
 	return nil
 }
 
-func draw(screen, brushImage *ebiten.Image, x, y int) {
+func draw(screen, brushImage *ebiten.Image, x, y, width, height int) {
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(x), float64(y))
+	op.GeoM.Translate(float64(x)-float64(width)/2.0, float64(y)-float64(height)/2.0)
 	screen.DrawImage(brushImage, op)
 }
 
 func drawTurret(screen, brushImage *ebiten.Image, x, y int, angle float64) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Rotate((angle - 90) * (math.Pi / 180))
-	op.GeoM.Translate(float64(x)+(tankWidth/2), float64(y))
+	op.GeoM.Translate(float64(x), float64(y))
 	screen.DrawImage(brushImage, op)
+}
+
+func checkCollisions(proj *projectile.Projectile, tanks []*tank.Tank) bool {
+	for _, tank := range tanks {
+		if proj.Position.X-float64(projectileWidth)/2.0 >= float64(tank.LocX)-float64(tankWidth)/2.0 &&
+			proj.Position.X+float64(projectileWidth)/2.0 <= float64(tank.LocX)+float64(tankWidth)/2.0 {
+			if proj.Position.Y-float64(projectileHeight)/2.0 >= float64(tank.LocY)-float64(tankHeight)/2.0 &&
+				proj.Position.Y+float64(projectileHeight)/2.0 <= float64(tank.LocY)+float64(tankHeight)/2.0 {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func main() {

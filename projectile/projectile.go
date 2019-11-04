@@ -14,6 +14,7 @@ type Projectile struct {
 	Acceleration vector.Vector
 	Velocity     vector.Vector
 	Position     vector.Vector
+	Remove       bool
 }
 
 func resolution(power float64, directionInRad float64) vector.Vector {

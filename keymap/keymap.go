@@ -82,7 +82,7 @@ func Logic(currentTank **tank.Tank, currentTankIndex *int, tanks *[]*tank.Tank, 
 		newProjectile.Owner = (*currentTank).Player
 		newProjectile.Position = vector.Vector{
 			X: float64((*currentTank).LocX),
-			Y: float64((*currentTank).LocY),
+			Y: float64((*currentTank).LocY) - 5.0,
 		}
 		*projectiles = append(*projectiles, &newProjectile)
 	}
