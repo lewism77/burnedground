@@ -1,5 +1,9 @@
 package tank
 
+import (
+	"github.com/hajimehoshi/ebiten"
+)
+
 // Tank - Holds data for a tank
 type Tank struct {
 	Player int
@@ -7,4 +11,5 @@ type Tank struct {
 	Power  float64
 	LocX   int
 	LocY   int
+	Sprite *ebiten.Image
 }

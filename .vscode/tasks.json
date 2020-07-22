@@ -1,0 +1,16 @@
+{
+	"version": "2.0.0",	
+	"type": "shell",	
+	"echoCommand": true,
+	"cwd": "${workspaceFolder}",
+	"tasks": [
+		{
+			"label": "Generate and GO",
+			"command": "go generate",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},		
+	]
+}
