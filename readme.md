@@ -3,7 +3,7 @@ First time setup
     a. place output wherever your $PATH variable points to
 2. Run Go Generate\
     a. In VS Code (taks.json):\
-        `Ctrl + Shift + P` > `Tasks: Run Task` > `Generate and GO`
+        `Ctrl + Shift + P` > `Tasks: Run Task` > `Generate and GO`\
     b. Command line:\
         `$ go generate`
 
