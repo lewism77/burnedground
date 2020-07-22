@@ -1,5 +1,5 @@
 First time setup
-1. Compile file2byteslice (https://github.com/hajimehoshi/file2byteslice)\
+1. Compile file2byteslice (https://github.com/hajimehoshi/file2byteslice) \
     a. place output wherever your $PATH variable points to
 2. Run Go Generate\
     a. In VS Code (taks.json):\
